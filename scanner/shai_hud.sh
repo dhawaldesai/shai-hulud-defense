@@ -63,6 +63,7 @@ if [ ! -d "$SCAN_DIR" ]; then
 fi
 
 SCAN_DIR=$(cd "$SCAN_DIR" && pwd)
+FINDINGS_LOG=$(mktemp)
 echo ""
 echo "Scanning: $SCAN_DIR (recursive)"
 echo "-----------------------------------"
@@ -79,6 +80,7 @@ for ROOT in $(get_scan_roots); do
     2>/dev/null -exec sh -c '
     if grep -q "SessionStart" "$1" && grep -q "setup.mjs" "$1"; then
       echo "  CRITICAL: Malicious Claude hook found: $1"
+      echo "FINDING" >> '"$FINDINGS_LOG"'
     fi
   ' _ {} \;
 done
@@ -89,6 +91,7 @@ find "$SCAN_DIR" -name 'settings.json' \
   2>/dev/null -exec sh -c '
   if grep -q "SessionStart" "$1" && grep -q "setup.mjs" "$1"; then
     echo "  CRITICAL: Malicious Claude hook found: $1"
+    echo "FINDING" >> '"$FINDINGS_LOG"'
   fi
 ' _ {} \;
 
@@ -99,6 +102,7 @@ echo "[2/6] Scanning for Bun dropper files..."
 find "$SCAN_DIR" -name "setup.mjs" 2>/dev/null -exec sh -c '
   if grep -qi "bun\|oven-sh\|BUN_VERSION" "$1"; then
     echo "  CRITICAL: Bun dropper found: $1"
+    echo "FINDING" >> '"$FINDINGS_LOG"'
   fi
 ' _ {} \;
 
@@ -110,6 +114,7 @@ find "$SCAN_DIR" -name "execution.js" 2>/dev/null | while read -r file; do
   SIZE=$(get_file_size "$file")
   if [ -n "$SIZE" ] && [ "$SIZE" -gt 1000000 ]; then
     echo "  CRITICAL: Large execution.js payload ($SIZE bytes): $file"
+    echo "FINDING" >> "$FINDINGS_LOG"
   fi
 done
 
@@ -121,6 +126,7 @@ echo "[4/6] Checking for malware lock file in $TMP_DIR..."
 LOCKFILE=$(find "$TMP_DIR" -maxdepth 1 -name "tmp.987654321.lock" 2>/dev/null)
 if [ -n "$LOCKFILE" ]; then
   echo "  CRITICAL: Malware lock file found: $LOCKFILE"
+  echo "FINDING" >> "$FINDINGS_LOG"
 fi
 
 # -------------------------------------------------------
@@ -135,6 +141,7 @@ find "$SCAN_DIR" -name "package.json" -not -path '*/node_modules/*' 2>/dev/null 
   fi
   if echo "$PREINSTALL" | grep -qEi "setup\.mjs|config\.mjs|execution\.js"; then
     echo "  WARNING: Suspicious preinstall in $1: $PREINSTALL"
+    echo "FINDING" >> '"$FINDINGS_LOG"'
   fi
 ' _ {} \;
 
@@ -147,8 +154,27 @@ find "$SCAN_DIR" -name ".git" -type d 2>/dev/null | while read -r gitdir; do
   git -C "$REPO_DIR" log --all --format='%H %ae %s' -- '.github/workflows/' 2>/dev/null | \
     grep -i 'claude\|noreply' | while read -r line; do
       echo "  REVIEW: [$REPO_DIR] AI-authored workflow change: $line"
+      echo "FINDING" >> "$FINDINGS_LOG"
     done
 done
 
 echo "-----------------------------------"
-echo "=== Scan complete ==="
+
+# -------------------------------------------------------
+# Summary
+# -------------------------------------------------------
+TOTAL=$(wc -l < "$FINDINGS_LOG" 2>/dev/null | tr -d ' ')
+TOTAL=${TOTAL:-0}
+rm -f "$FINDINGS_LOG"
+
+if [ "$TOTAL" -eq 0 ]; then
+  echo ""
+  echo "CLEAN: No indicators of compromise found."
+  echo "=== Scan complete ==="
+  exit 0
+else
+  echo ""
+  echo "ALERT: $TOTAL finding(s) detected. Review the output above."
+  echo "=== Scan complete ==="
+  exit 1
+fi
