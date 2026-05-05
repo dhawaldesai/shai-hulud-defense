@@ -254,7 +254,7 @@ if [ "$TOTAL" -eq 0 ]; then
 else
   echo ""
   echo -e "  ${RED}╔════════════════════════════════════════════════╗${NC}"
-  printf "  ${RED}║   ALERT — %-3s finding(s) detected              ║${NC}\n" "$TOTAL"
+  printf "   ${RED}║  ALERT — %-3s finding(s) detected              ║${NC}\n" "$TOTAL"
   echo -e "  ${RED}║   Review the output above for details          ║${NC}"
   echo -e "  ${RED}╚════════════════════════════════════════════════╝${NC}"
   echo ""
