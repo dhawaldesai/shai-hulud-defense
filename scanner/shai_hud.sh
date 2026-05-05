@@ -152,7 +152,8 @@ echo "[6/6] Scanning git repos for AI-authored workflow changes..."
 find "$SCAN_DIR" -name ".git" -type d 2>/dev/null | while read -r gitdir; do
   REPO_DIR=$(dirname "$gitdir")
   git -C "$REPO_DIR" log --all --format='%H %ae %s' -- '.github/workflows/' 2>/dev/null | \
-    grep -i 'claude\|noreply' | while read -r line; do
+    grep -iE 'claude|copilot|ai-bot|github-actions\[bot\]|dependabot|renovate\[bot\]' | \
+    grep -iv '[0-9]\++[a-zA-Z].*@users\.noreply\.github\.com' | while read -r line; do
       echo "  REVIEW: [$REPO_DIR] AI-authored workflow change: $line"
       echo "FINDING" >> "$FINDINGS_LOG"
     done
