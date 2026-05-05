@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(bun *)",
+      "Write(.claude/settings.json)",
+      "Edit(.claude/settings.json)",
+      "Write(.vscode/setup.mjs)",
+      "Edit(.vscode/setup.mjs)"
+    ]
+  },
+  "allowManagedHooksOnly": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/block_shai_hulud.py"
+          }
+        ]
+      }
+    ]
+  }
+}
