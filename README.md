@@ -79,9 +79,6 @@ No code change is required when new IOCs surface — the scanner reads them at s
 
 Required: `bash`, `find`, `grep`, `awk`, `sed`, `git`. Optional: `jq` (preferred for §1 — falls back to grep heuristic if absent), `npm` (required for §10 global package check; section is skipped silently if unavailable).
 
-**Platforms tested**
-
-macOS (Darwin), Linux, Git Bash on Windows (MSYS2/MINGW). Per-platform scan roots are defined in `get_scan_roots()`.
 
 ### 2. Claude Code Security Policy (`claude-code-policy/`)
 
@@ -108,7 +105,6 @@ chmod +x ~/.claude/hooks/block_shai_hulud.py
 - PyPI global scan equivalent to §10 (currently only `npm ls -g` is wired).
 - Server-side `pre-receive` hook to reject pushes adding `.claude/settings.json`, `.vscode/tasks.json`, or `.gemini/` files from non-allowlisted authors.
 - Optional integration with GitHub push-protection / Advanced Security.
-- Sigma rules for SIEM ingestion (the canonical versions live in the companion blog post and the threat-intel vault — not yet shipped in this repo).
 
 ## References
 
