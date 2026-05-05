@@ -46,6 +46,7 @@ chmod +x ~/.claude/hooks/block_shai_hulud.py
 
 ## References
 
+- [When the tool fights back] (https://cisomandate.com/when-the-tool-fights-back-three-ways-ai-coding-assistants-have-become-an-attack-surface/)
 - [Sophos Blog: Mini Shai-Hulud](https://www.sophos.com/en-us/blog/-mini-shai-hulud-supply-chain-attack-targets-sap-npm-packages)
 - [Mend.io: Shai-Hulud SAP CAP Attack](https://www.mend.io/blog/shai-hulud-sap-cap-supply-chain-attack-claude-code/)
 
