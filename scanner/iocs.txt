@@ -1,0 +1,53 @@
+# Shai-Hulud / Mini Shai-Hulud IOC list
+# Format: TYPE|VALUE|NOTES
+# Lines starting with # are ignored. Update version + date when modifying.
+#
+# version: 2026-05-05.1
+# campaign: Mini Shai-Hulud SAP CAP / TeamPCP
+# sources:
+#   - https://www.sophos.com/en-us/blog/-mini-shai-hulud-supply-chain-attack-targets-sap-npm-packages
+#   - https://www.wiz.io/blog/mini-shai-hulud-supply-chain-sap-npm
+#   - https://onapsis.com/blog/sap-cap-mini-shai-hulud-supply-chain-attack/
+#   - https://www.mend.io/blog/shai-hulud-sap-cap-supply-chain-attack-claude-code/
+#   - https://www.reversinglabs.com/blog/claude-promptmink-malware-crypto
+
+# --- Dropper / payload filenames ---
+FILENAME|setup.mjs|Bun dropper used by Mini Shai-Hulud
+FILENAME|execution.js|Large credential-stealer payload (>1MB, obfuscated)
+FILENAME|config.mjs|Secondary dropper variant
+
+# --- Lock / sentinel files ---
+LOCKFILE|tmp.987654321.lock|Anti-double-execution marker in temp dir
+
+# --- Malicious npm packages (Mini Shai-Hulud SAP CAP April 2026) ---
+NPM|@sap/cds-mtxs|Compromised SAP CAP package
+NPM|@sap/cds-mtx|Compromised SAP CAP package
+NPM|@sap/cds-fiori|Compromised SAP CAP package
+NPM|@sap/cds-dk|Compromised SAP CAP package
+
+# --- Malicious PyPI packages ---
+PYPI|lightning|Versions 2.6.2 and 2.6.3 compromised
+
+# --- PromptMink (DPRK Famous Chollima) AI-targeted packages ---
+NPM|@validate-sdk/v2|Inserted by Claude Opus co-authored commit Feb 2026
+
+# --- Indicator strings inside settings.json hooks ---
+HOOKSTRING|SessionStart|Hook event abused for persistence
+HOOKSTRING|setup.mjs|Dropper invocation
+HOOKSTRING|execution.js|Payload invocation
+
+# --- Worm exfiltration repository names ---
+REPONAME|Shai-Hulud|GitHub repo created by worm to publish stolen secrets
+REPONAME|A Mini Shai-Hulud has Appeared|Worm-created repo title
+
+# --- Suspect commit author identities (NOT an exhaustive list — review case by case) ---
+# Legitimate bot accounts should be in the scanner allowlist, not here.
+EMAILSUBSTRING|@noreply.shai|placeholder — replace with confirmed worm identities
+
+# --- Agentic-tool config files that have been used as RCE / persistence vectors ---
+CONFIGPATH|.claude/settings.json|Claude Code SessionStart hook
+CONFIGPATH|.vscode/tasks.json|VS Code runOn:folderOpen task
+CONFIGPATH|.gemini/settings.json|Gemini CLI CVSS 10.0 RCE vector
+CONFIGPATH|.gemini/config.yaml|Gemini CLI alt config path
+CONFIGPATH|AGENTS.md|Cursor AGENTS.md context-injection (CVE-2026-26268)
+CONFIGPATH|.cursor/rules|Cursor rules directory
