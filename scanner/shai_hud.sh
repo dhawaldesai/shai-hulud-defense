@@ -247,7 +247,7 @@ rm -f "$FLOG"
 if [ "$TOTAL" -eq 0 ]; then
   echo ""
   echo -e "  ${GREEN}╔════════════════════════════════════════════════╗${NC}"
-  echo -e "  ${GREEN}║   CLEAN — No indicators of compromise found   ║${NC}"
+  echo -e "  ${GREEN}║   CLEAN — No indicators of compromise found    ║${NC}"
   echo -e "  ${GREEN}╚════════════════════════════════════════════════╝${NC}"
   echo ""
   exit 0
