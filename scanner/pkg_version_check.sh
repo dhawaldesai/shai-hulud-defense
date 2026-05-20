@@ -76,7 +76,7 @@ for arg in "$@"; do
       echo "  --skip-node-modules   Exclude node_modules from local scan (misses installed-but-unlocked packages)"
       echo ""
       echo "Env overrides:"
-      echo "  IOC_CSV=<path>        CSV of (package,version) pairs  [default: ~/Downloads/Mini Shai-Hulud - Sheet1.csv]"
+      echo "  IOC_CSV=<path>        CSV of (package,version) pairs  [default: scanner/mini-shai-hulud-packages.csv]"
       echo "  PROJECT_DIR=<path>    Local project to scan            [default: interactive prompt]"
       echo "  REPORT_FILE=<path>    Output report path               [default: ./shai-hulud-pkg-scan-TIMESTAMP.log]"
       exit 0
@@ -98,7 +98,8 @@ echo ""
 # -------------------------------------------------------
 # Load CSV
 # -------------------------------------------------------
-DEFAULT_CSV="$HOME/Downloads/ Mini Shai-Hulud - Sheet1.csv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_CSV="$SCRIPT_DIR/mini-shai-hulud-packages.csv"
 IOC_CSV="${IOC_CSV:-$DEFAULT_CSV}"
 
 if [ ! -f "$IOC_CSV" ]; then
