@@ -80,7 +80,38 @@ No code change is required when new IOCs surface — the scanner reads them at s
 Required: `bash`, `find`, `grep`, `awk`, `sed`, `git`. Optional: `jq` (preferred for §1 — falls back to grep heuristic if absent), `npm` (required for §10 global package check; section is skipped silently if unavailable).
 
 
-### 2. Claude Code Security Policy (`claude-code-policy/`)
+### 2. Affected-Package Version Scanner (`scanner/pkg_version_check.sh`)
+
+Companion to the IOC scanner. Reads a CSV of affected `package,version` pairs (e.g. the Mini Shai-Hulud IOC feed at `~/Downloads/Mini Shai-Hulud - Sheet1.csv` — 633 npm package/version pairs) and checks whether they appear in:
+
+1. A user-supplied local project directory — scans `package.json`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, and installed `node_modules/<pkg>/package.json`. PyPI manifests (`requirements.txt`, `poetry.lock`, `Pipfile.lock`) are also checked when the CSV contains unscoped names.
+2. The user's GitHub repos — via `gh` CLI: code search across lockfile types, then exact-version validation via the dependency-graph SBOM API (`/repos/{owner}/{repo}/dependency-graph/sbom`).
+
+**Severity model:** exact `pkg@version` match in a lockfile, `node_modules/`, or SBOM → `[CRITICAL]`. Range specifier (`^1.2.3`, `~1.2.3`, `>=…`) that could include the affected version → `[REVIEW]`. Package name match without version confirmation → `[REVIEW]`. Output streams to terminal and to `./shai-hulud-pkg-scan-YYYYMMDD-HHMMSS.log` (ANSI-stripped), with a severity-breakdown summary at the end.
+
+**Usage:**
+```bash
+# Interactive — prompts for project directory
+bash scanner/pkg_version_check.sh
+
+# Fully scripted (env-var overrides)
+PROJECT_DIR=/path/to/project \
+  IOC_CSV="$HOME/Downloads/Mini Shai-Hulud - Sheet1.csv" \
+  REPORT_FILE=/var/log/pkg-scan.log \
+  bash scanner/pkg_version_check.sh --skip-node-modules
+```
+
+**CSV format:** col1 = package name (scoped names like `@scope/pkg` supported), col2 = exact affected version. A header row is auto-detected and skipped. Override the path with `IOC_CSV=…`.
+
+**Dependencies:** `bash`, `find`, `grep`, `awk`, `sed`. Optional: `jq` (improves `node_modules/<pkg>/package.json` parsing accuracy), `gh` (required for the GitHub phase — phase is skipped with a clear message if absent or unauthenticated).
+
+**Known limitations:**
+- GitHub code search misses lockfiles >384KB and only indexes default branches — the SBOM path is the authoritative check.
+- GitHub phase is rate-limit-bound (10 req/min authenticated); throttled at ~5 packages per 7s, so a full 633-row CSV takes ~22 minutes against GitHub. Run local scans first, GitHub phase separately.
+- Lockfile parsing is `grep`-based, not fully parsed — deeply nested or unusual formatting may produce false negatives. Highest-value follow-up is jq-based lockfile parsing.
+- SBOM API requires the repo's dependency graph to be enabled and indexed; repos without it fall back to `[REVIEW]`.
+
+### 3. Claude Code Security Policy (`claude-code-policy/`)
 
 Prevention layer for Claude Code, complementing the detection layer above.
 
