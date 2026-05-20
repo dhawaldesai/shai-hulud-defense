@@ -146,6 +146,7 @@ chmod +x ~/.claude/hooks/block_shai_hulud.py
 - [Novee Security: Google Gemini CLI RCE — CVSS 10.0 advisory](https://novee.security/blog/google-gemini-cli-rce-vulnerability-cvss-10-critical-security-advisory/)
 - [The Hacker News: Google fixes CVSS 10 Gemini CLI CI/CD RCE (also covers Cursor CVE-2026-26268)](https://thehackernews.com/2026/04/google-fixes-cvss-10-gemini-cli-ci-rce.html)
 - [ReversingLabs: PromptMink — DPRK malware inserted into codebase via Claude](https://www.reversinglabs.com/blog/claude-promptmink-malware-crypto)
+- [Endor Labs: Mini Shai-Hulud returns — 42 malicious npm packages with fake Sigstore badges in @antv ecosystem attack](https://www.endorlabs.com/learn/mini-shai-hulud-returns-42-malicious-npm-packages-fake-sigstore-badges-in-antv-ecosystem-attack)
 
 ## Contributing
 
